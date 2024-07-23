@@ -79,21 +79,6 @@ function hasfeature(rule1,rule2,rule3,unitid,x,y,checkedconds,ignorebroken_)
 				end
 			end
 		end
-		
-		if (string.sub(rule1,1,4) == "obj_") and (featureindex["obj"] ~= nil) then
-			for i,rules in ipairs(featureindex["obj"]) do
-				local rule = rules[1]
-				local conds = rules[2]
-				
-				if (conds[1] ~= "never") then
-					if (rule[1] == "obj") and (rule[2] == rule2) and (rule[3] == rule3) then
-						if testcond(conds,unitid,x,y,nil,nil,checkedconds,ignorebroken) then
-							return true
-						end
-					end
-				end
-			end
-		end
 	end
 
 	if (rule3 ~= nil) and (rule2 ~= nil) and (rule1 ~= nil) then
@@ -104,21 +89,6 @@ function hasfeature(rule1,rule2,rule3,unitid,x,y,checkedconds,ignorebroken_)
 
 				if (conds[1] ~= "never") then
 					if (rule[1] == rule1) and (rule[2] == rule2) and (rule[3] == rule3) then
-						if testcond(conds,unitid,x,y,nil,nil,checkedconds,ignorebroken) then
-							return true
-						end
-					end
-				end
-			end
-		end
-		
-		if (string.sub(rule3,1,4) == "obj_") and (featureindex["obj"] ~= nil) then
-			for i,rules in ipairs(featureindex["obj"]) do
-				local rule = rules[1]
-				local conds = rules[2]
-				
-				if (conds[1] ~= "never") then
-					if (rule[1] == rule1) and (rule[2] == rule2) and (rule[3] == "obj") then
 						if testcond(conds,unitid,x,y,nil,nil,checkedconds,ignorebroken) then
 							return true
 						end

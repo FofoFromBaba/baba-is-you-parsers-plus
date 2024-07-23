@@ -170,7 +170,6 @@ glyphtypes = {
 	metatext = 5,
 	metaevent = 5,
 	metanode = 5,
-	metaobj = 5,
 	metanot = 4,
 	node = 0,
 	group = 3,
@@ -2158,12 +2157,6 @@ function toometafunc(name)
 		if (glyphfound ~= 1) and (basefound == 1) then
 			return true
 		end
-	elseif (string.sub(name,1,4) == "obj_") then
-		local basefound = foundbasereference(name)
-		local objfound = foundreference(name)
-		if (objfound ~= 1) and (basefound == 1) then
-			return true
-		end
 	elseif (string.sub(name,1,5) == "node_") then
 		local basefound = foundbasereference(name)
 		local nodefound = foundreference(name)
@@ -2183,7 +2176,7 @@ function foundreference(name)
 			return 1
 		end
 		return 0
-	elseif (string.sub(name,1,6) == "glyph_") or (string.sub(name,1,6) == "event_") or (string.sub(name,1,5) == "node_") or (string.sub(name,1,4) == "obj_") then
+	elseif (string.sub(name,1,6) == "glyph_") or (string.sub(name,1,6) == "event_") or (string.sub(name,1,5) == "node_") then
 		if (unitreference[name] ~= nil) then
 			return 1
 		end
@@ -2195,13 +2188,11 @@ end
 
 function foundbasereference(name)
 	local base = name
-	if (string.sub(base,1,5) == "text_") or (string.sub(base,1,6) == "glyph_") or (string.sub(base,1,6) == "event_") or (string.sub(base,1,5) == "node_") or (string.sub(base,1,4) == "obj_") then
+	if (string.sub(base,1,5) == "text_") or (string.sub(base,1,6) == "glyph_") or (string.sub(base,1,6) == "event_") or (string.sub(base,1,5) == "node_") then
 		if (string.sub(base,1,5) == "text_") or (string.sub(base,1,5) == "node_") then
 			base = string.sub(base, 6)
 		elseif (string.sub(base,1,6) == "glyph_") or (string.sub(base,1,6) == "event_") then
 			base = string.sub(base, 7)
-		elseif (string.sub(base,1,4) == "obj_") then
-			base = string.sub(base, 5)
 		end
 	end
 	return foundreference(base)
@@ -2217,9 +2208,6 @@ condlist['references'] = function(params,checkedconds,checkedconds_,cdata)
 	end
 	local unitname = unit.strings[UNITNAME]
 	params[1] = string.sub(params[1], 2)
-	if (string.sub(unitname, 1, 4) == "obj_") then
-		return (string.sub(unitname, 5) == params[1]), checkedconds
-	end
 	if (string.sub(unitname, 1, 5) == "text_") or (string.sub(unitname, 1, 5) == "node_") then
 		return (string.sub(unitname, 6) == params[1]), checkedconds
 	end
@@ -2259,14 +2247,6 @@ function referencesnode(unit, param)
 	local unitname = unit.strings[UNITNAME]
 	if (string.sub(unitname, 1, 5) == "node_") then
 		return (string.sub(unitname, 6) == params[1]), checkedconds
-	end
-	return false, checkedconds
-end
-
-function referencesobj(unit, param)
-	local unitname = unit.strings[UNITNAME]
-	if (string.sub(unitname, 1, 4) == "obj_") then
-		return (string.sub(unitname, 5) == params[1]), checkedconds
 	end
 	return false, checkedconds
 end
@@ -2363,7 +2343,7 @@ function isglyphmeta(input_string, id)
 	if string.sub(input_string,1,6) ~= "glyph_" then
 		return false
 	end
-	return (input_string == "glyph_meta") or (input_string == "glyph_metatext") or (input_string == "glyph_metaevent") or (input_string == "glyph_metanode") or (input_string == "glyph_metaobj")
+	return (input_string == "glyph_meta") or (input_string == "glyph_metatext") or (input_string == "glyph_metaevent") or (input_string == "glyph_metanode")
 end
 
 function isprefix(input_string, id)
@@ -2446,7 +2426,6 @@ function metaprefix(x, y)
 	local is_text = false
 	local is_event = false
 	local is_node = false
-	local is_obj = false
 	local im_done = false
 	if (tilemetaglyphdata[x + y * roomsizex] ~= nil) then
 		if tilemetaglyphdata[x + y * roomsizex] == 1 then
@@ -2457,8 +2436,6 @@ function metaprefix(x, y)
 			return "event_"
 		elseif tilemetaglyphdata[x + y * roomsizex] == 4 then
 			return "node_"
-		elseif tilemetaglyphdata[x + y * roomsizex] == 5 then
-			return "obj_"
 		elseif tilemetaglyphdata[x + y * roomsizex] == 0 then
 			return ""
 		end
@@ -2476,9 +2453,6 @@ function metaprefix(x, y)
 					break
 				elseif (name == "glyph_metanode") then
 					is_node = true
-				elseif (name == "glyph_metaobj") then
-					is_obj = true
-					break
 				elseif (name == "glyph_meta") then
 					is_meta = true
 					im_done = true
@@ -2502,9 +2476,6 @@ function metaprefix(x, y)
 	elseif is_node then
 		tilemetaglyphdata[x + y * roomsizex] = 4
 		return "node_"
-	elseif is_obj then
-		tilemetaglyphdata[x + y * roomsizex] = 5
-		return "obj_"
 	else
 		tilemetaglyphdata[x + y * roomsizex] = 0
 		return ""
@@ -3013,9 +2984,6 @@ function determinemetaglyphs(glyphtable)
 		elseif (prefix == "node_") then
 			metaglyphdata[j] = 4
 			tilemetaglyphdata[x + y * roomsizex] = 4
-		elseif (prefix == "obj_") then
-			metaglyphdata[j] = 5
-			tilemetaglyphdata[x + y * roomsizex] = 5
 		else
 			metaglyphdata[j] = 0
 			tilemetaglyphdata[x + y * roomsizex] = 0
@@ -3363,8 +3331,6 @@ function doglyphs(symbols)
 			addoption({v[1], v[2], v[3]}, copyconds({}, conds[i]), ids[i], nil, nil, {"glyphrule", "metaevent", "glyph_" .. string.sub(v[1],6)})
 		elseif string.sub(v[1],1,6) == "node_" then
 			addoption({v[1], v[2], v[3]}, copyconds({}, conds[i]), ids[i], nil, nil, {"glyphrule", "metanode", "glyph_" .. string.sub(v[1],5)})
-		elseif string.sub(v[1],1,6) == "obj_" then
-			addoption({v[1], v[2], v[3]}, copyconds({}, conds[i]), ids[i], nil, nil, {"glyphrule", "metaobj", "glyph_" .. string.sub(v[1],4)})
 		else
 			addoption({v[1], v[2], v[3]}, copyconds({}, conds[i]), ids[i], nil, nil, {"glyphrule"})
 		end
@@ -3514,12 +3480,10 @@ function findsymbolunits()
 								start = tags[3]
 							elseif tags[2] == "metanode" then
 								start = tags[3]
-							elseif tags[2] == "metaobj" then
-								start = tags[3]
 							end
 
 							-- Tässä pitäisi testata myös Group!
-							if (((tags[2] == "metatext") or (tags[2] == "metaglyph") or (tags[2] == "metaevent") or (tags[2] == "metanode") or (tags[2] == "metaobj")) and (idunit.strings[UNITNAME] == start)) or ((idunit.strings[UNITNAME] == "text_" .. start) and (tags[1] ~= "glyphrule")) or ((idunit.strings[UNITNAME] == "event_" .. start) and (tags[1] ~= "glyphrule")) or ((idunit.strings[UNITNAME] == "node_" .. start) and (tags[1] ~= "glyphrule")) or ((idunit.strings[UNITNAME] == "obj_" .. start) and (tags[1] ~= "glyphrule")) or (idunit.strings[UNITNAME] == "glyph_" .. start) or ((idunit.strings[UNITNAME] == start) and (tags[1] ~= "glyphrule")) or ((start == "all") and (name ~= "text")) then
+							if (((tags[2] == "metatext") or (tags[2] == "metaglyph") or (tags[2] == "metaevent") or (tags[2] == "metanode")) and (idunit.strings[UNITNAME] == start)) or ((idunit.strings[UNITNAME] == "text_" .. start) and (tags[1] ~= "glyphrule")) or ((idunit.strings[UNITNAME] == "event_" .. start) and (tags[1] ~= "glyphrule")) or ((idunit.strings[UNITNAME] == "node_" .. start) and (tags[1] ~= "glyphrule")) or (idunit.strings[UNITNAME] == "glyph_" .. start) or ((idunit.strings[UNITNAME] == start) and (tags[1] ~= "glyphrule")) or ((start == "all") and (name ~= "text")) then
 								--MF_alert("Matching objects - found")
 								found = true
 							elseif (string.sub(start, 1, 5) == "group") then

@@ -7,12 +7,12 @@ function conversion(dolevels_)
 
 		local operator = words[2]
 
-		if (operator == "is") or (operator == "write") or (operator == "become") or (operator == "inscribe") or (operator == "becobj") then
+		if (operator == "is") or (operator == "write") or (operator == "become") or (operator == "inscribe") then
 			local output = {}
 			local name = words[1]
 			local thing = words[3]
 
-			if (getmat(thing) ~= nil) or (thing == "not " .. name) or (thing == "all") or (unitreference[thing] ~= nil) or ((thing == "text") and ((unitreference["text_text"] ~= nil or unitreference["node_text"] ~= nil) or (unitreference["glyph_metatext"] ~= nil))) or ((thing == "node") and ((unitreference["text_node"] ~= nil or unitreference["node_node"] ~= nil) or (unitreference["glyph_metanode"] ~= nil))) or (thing == "revert") or (thing == "createall") or (thing == "deobj") or (thing == "_") or (thing == "glyph") or (thing == "event") or ((operator == "write") and (getmat_text("text_" .. name) or getmat_text(name))) or ((operator == "inscribe") and (getmat("glyph_" .. name) or getmat(name))) or ((string.sub(name, 1, 5) == "text_") and getmat_text(name)) or ((operator == "becobj") and (getmat("obj_" .. name) ~= nil)) then
+			if (getmat(thing) ~= nil) or (thing == "not " .. name) or (thing == "all") or (unitreference[thing] ~= nil) or ((thing == "text") and ((unitreference["text_text"] ~= nil or unitreference["node_text"] ~= nil) or (unitreference["glyph_metatext"] ~= nil))) or ((thing == "node") and ((unitreference["text_node"] ~= nil or unitreference["node_node"] ~= nil) or (unitreference["glyph_metanode"] ~= nil))) or (thing == "revert") or (thing == "createall") or (thing == "glyph") or (thing == "event") or ((operator == "write") and (getmat_text("text_" .. name) or getmat_text(name))) or ((operator == "inscribe") and (getmat("glyph_" .. name) or getmat(name))) or ((string.sub(name, 1, 5) == "text_") and getmat_text(name)) then
 				if (featureindex[name] ~= nil) and (alreadydone[name] == nil) then
 					alreadydone[name] = 1
 
@@ -23,7 +23,7 @@ function conversion(dolevels_)
 
 						if (verb == "is") or (verb == "become") then
 							if (target == name) and (object ~= "word") and (object ~= "break") and (object ~= "symbol") and ((object ~= name) or (verb == "become")) then
-								if (object ~= "text") and (object ~= "obj") and (object ~= "glyph") and (object ~= "event") and (object ~= "node") and (object ~= "revert") and (object ~= "createall") and (object ~= "deobj") and (object ~= "_") then
+								if (object ~= "text") and (object ~= "glyph") and (object ~= "event") and (object ~= "node") and (object ~= "revert") and (object ~= "createall") then
 									if (object == "not " .. name) then
 										table.insert(output, {"error", conds, "is"})
 
@@ -60,14 +60,6 @@ function conversion(dolevels_)
 									table.insert(output, {object, conds, "inscribe"})
 								end
 							end
-						elseif (verb == "becobj") then
-							if (string.sub(object, 1, 4) ~= "not ") and (target == name) then
-								if toometafunc("obj_" .. object) then
-									table.insert(output, {"toometa", conds, "is"})
-								else
-									table.insert(output, {object, conds, "becobj"})
-								end
-							end
 						end
 					end
 				end
@@ -81,7 +73,7 @@ function conversion(dolevels_)
 						local op = v3[3]
 
 						if (op == "is") then
-							if (findnoun(object,nlist.brief) == false) and (object ~= "word") and (object ~= "break") and (object ~= "symbol") and (object ~= "text") and (object ~= "glyph") and (object ~= "event") and (object ~= "node") and (object ~= "obj") then
+							if (findnoun(object,nlist.brief) == false) and (object ~= "word") and (object ~= "break") and (object ~= "symbol") and (object ~= "text") and (object ~= "glyph") and (object ~= "event") and (object ~= "node") then
 								table.insert(conversions, v3)
 							elseif (object == "all") then
 								--[[
@@ -89,10 +81,10 @@ function conversion(dolevels_)
 								createall({name,conds})
 								]]--
 								table.insert(conversions, {"createall",conds})
-							elseif (object == "text") or (object == "event") or (object == "node") or (object == "glyph") or (object == "obj") then
+							elseif (object == "text") or (object == "event") or (object == "node") or (object == "glyph") then
 								table.insert(conversions, {object .. "_" .. name,conds})
 							end
-						elseif (op == "write") or (op == "inscribe") or (op == "becobj") then
+						elseif (op == "write") or (op == "inscribe") then
 							table.insert(conversions, v3)
 						end
 					end
@@ -158,20 +150,8 @@ function convert(stuff,mats,dolevels_)
 
 							if (op == "write") then
 								mat2 = "text_" .. matdata[1]
-							elseif (op == "becobj") then
-								mat2 = "obj_" .. matdata[1]
 							elseif (op == "inscribe") then
 								mat2 = "glyph_" .. matdata[1]
-							elseif (mat2 == "deobj") then
-								local uname = unit.strings[UNITNAME]
-								if uname:sub(1,4) == "obj_" then
-									mat2 = uname:sub(5)
-								end 
-							elseif (mat2 == "_") then
-								local uname = getname(unit)
-								if uname ~= "text" and uname ~= "glyph" and uname ~= "node" and uname ~= "event" then
-									mat2 = uname .. "_" .. uname
-								end
 							end
 
 							if mat2 == "text_event" and mat1 == "event" then
