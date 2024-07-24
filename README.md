@@ -1,2 +1,12 @@
-# baba is you parsers plus
- merges several community-made Baba Is You mods into one abomination
+# Parsers Plus
+Merges several community-made Baba Is You with a focus on adding new object types that can make rules.
+## Credits
+@mathman2028 - Nodes, various sprites
+
+@wreckinggames - Events, various sprites
+
+@mathguy24 - Glyphs
+
+@extrem_xxen - "Refers" word
+
+@dizzyandy - various sprites
