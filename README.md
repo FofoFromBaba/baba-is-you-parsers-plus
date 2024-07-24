@@ -1,5 +1,5 @@
 # Parsers Plus
-Merges several community-made Baba Is You with a focus on adding new object types that can make rules.
+Merges several community-made Baba Is You mods with a focus on adding new object types that can make rules.
 ## Credits
 @mathman2028 - Nodes, various sprites
 
