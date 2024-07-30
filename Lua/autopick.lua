@@ -26,6 +26,7 @@ function editor_autopick(text)
 		["#"] = "glyph_",
 		[";"] = "event_",
 		["^"] = "node_",
+		["￼"] = "obj_"
 	}
 
 	if string.sub(text, 1, 1) == "!" then

@@ -41,7 +41,7 @@ function addunit(id,undoing_,levelstart_)
 		unitlists[name] = {}
 	end
 
-	if (string.sub(name_, 1, 5) == "text_" or string.sub(name_, 1, 5) == "node_") then
+	if (string.sub(name_, 1, 5) == "text_" or string.sub(name_, 1, 5) == "node_") or (string.sub(name_, 1, 4) == "obj_") then
 		unit.flags[META] = true
 	end
 

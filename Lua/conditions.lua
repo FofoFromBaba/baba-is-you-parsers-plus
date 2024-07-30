@@ -42,6 +42,8 @@ function testcond(conds,unitid,x_,y_,autofail_,limit_,checkedconds_,ignorebroken
 
 		if (unit.strings[UNITTYPE] == "text") then
 			name = "text"
+		elseif (unit.strings[UNITTYPE] == "obj") then
+			name = "obj"
 		end
 	elseif (unitid == 2) then
 		x = x_
@@ -932,11 +934,17 @@ for i, j in pairs(params) do
 		if (string.sub(unitname, 7) == _params) then
 			return true, checkedconds
 		end
+	elseif (string.sub(unitname, 1, 4) == "obj_") then
+		if (string.sub(unitname, 5) == _params) then
+			return true, checkedconds
+		end
 	end
 
     if hasfeature(unitname,"is","word",cdata.unitid) and (unitname == _params) then
         return true, checkedconds
     elseif hasfeature(unitname,"is","symbol",cdata.unitid) and (unitname == _params) then
+        return true, checkedconds
+    elseif hasfeature(unitname,"is","object",cdata.unitid) and (unitname == _params) then
         return true, checkedconds
     end
 end
