@@ -3,10 +3,10 @@ Merges several community-made Baba Is You mods with a focus on adding new object
 ## Credits
 @mathman2028 - Nodes, various sprites
 
-@wreckinggames - Events, various sprites
+@wreckinggames - Events, Orbs, various sprites
 
 @mathguy24 - Glyphs
 
 @extrem_xxen - "Refers" word
 
-@dizzyandy - various sprites
+@dizzyandy - Obj, various sprites
