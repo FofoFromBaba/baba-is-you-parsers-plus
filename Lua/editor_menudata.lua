@@ -199,7 +199,7 @@ menufuncs.currobjlist =
 							
 							if (ut == "object") then
 								c = getactualdata_objlist(obj.object, "colour")
-							elseif (ut == "text") or (ut == "node") or (ut == "logic") then
+							elseif (ut == "text") or (ut == "node") or (ut == "logic") or (ut == "obj") then
 								c = getactualdata_objlist(obj.object, "active")
 							end
 							

@@ -1103,6 +1103,7 @@ event_text_types["9"] = "number"
 
 event_text_types["refers"] = "condition"
 event_text_types["node"] = "noun"
+event_text_types["obj"] = "noun"
 
 verb_allowed_types = {}
 verb_allowed_types["turn"] = {"direction"}
