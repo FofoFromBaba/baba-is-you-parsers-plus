@@ -7,6 +7,6 @@ Merges several community-made Baba Is You mods with a focus on adding new object
 
 @mathguy24 - Glyphs
 
-@extrem_xxen - "Refers" word
+@extrem_xxen - Logic, "Refers" word
 
 @dizzyandy - Obj, various sprites
