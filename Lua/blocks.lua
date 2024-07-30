@@ -1625,6 +1625,10 @@ function moveblock(onlystartblock_)
 						if (string.sub(unit.strings[UNITNAME], 1, 6) == "event_") then
 							name = "event"
 						end
+						
+						if (unit.strings[UNITTYPE] == "logic") then
+							name = "logic"
+						end
 
 						if (featureindex[name] ~= nil) then
 							for a,b in ipairs(featureindex[name]) do
@@ -1895,7 +1899,7 @@ function moveblock(onlystartblock_)
 										newunit.followed = followed
 										newunit.back_init = back_init
 
-										if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node") or isglyph(newunit) then
+										if (newunit.strings[UNITTYPE] == "text" or newunit.strings[UNITTYPE] == "node") or isglyph(newunit) or (newunit.strings[UNITTYPE] == "logic") then
 											updatecode = 1
 										end
 
@@ -2635,8 +2639,7 @@ function block(small_)
 
 				local exists = false
 
-				if (v ~= "text") and (v ~= "glyph") and (v ~= "all") and (v ~= "event") and (v ~= "node") then
-
+				if (v ~= "text") and (v ~= "glyph") and (v ~= "all") and (v ~= "event") and (v ~= "node") and (v ~= "logic") then
 					for b,mat in pairs(objectlist) do
 						if (b == v) then
 							exists = true
@@ -2644,6 +2647,12 @@ function block(small_)
 						if (string.sub(v, 1, 5) == "text_") and getmat_text(v)then
 							exists = true
 							break
+						end
+					end
+				elseif (v == "logic") then
+					for b,mat in pairs(objectlist) do
+						if (b == "logic_" .. name) then
+							exists = true
 						end
 					end
 				else
@@ -2691,7 +2700,12 @@ function block(small_)
 								create("event_" .. name,x,y,dir,x,y,nil,nil,leveldata)
 								updatecode = 1
 							end
-						elseif (string.sub(v, 1, 5) == "text_") or (string.sub(v, 1, 6) == "glyph_") or (string.sub(v, 1, 6) == "event_") or (string.sub(v, 1, 5) == "node_") then
+						elseif (v == "logic") then
+							if (name ~= "logic") and (name ~= "all") then
+								create("logic_" .. name,x,y,dir,x,y,nil,nil,leveldata)
+								updatecode = 1
+							end
+						elseif (string.sub(v, 1, 5) == "text_") or (string.sub(v, 1, 6) == "glyph_") or (string.sub(v, 1, 6) == "event_") or (string.sub(v, 1, 5) == "node_") or (string.sub(v, 1, 6) == "logic_") then
 							create(v,x,y,dir,x,y,nil,nil,leveldata)
 						elseif (string.sub(v, 1, 5) == "group") then
 							--[[
@@ -2972,7 +2986,7 @@ function effectblock()
 				end
 			elseif (#unit.colours == 0) then
 				if (unit.values[A] > 0) and (math.floor(unit.values[A]) == unit.values[A]) then
-					if ((unit.strings[UNITTYPE] ~= "text" and unit.strings[UNITTYPE] ~= "node") and (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_")) or (unit.active == false) then
+					if ((unit.strings[UNITTYPE] ~= "text" and unit.strings[UNITTYPE] ~= "node" and unit.strings[UNITTYPE] ~= "logic") and (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_")) or (unit.active == false) then
 						setcolour(unit.fixed)
 					else
 						setcolour(unit.fixed,"active")
@@ -2982,7 +2996,7 @@ function effectblock()
 			else
 				unit.values[A] = ca
 
-				if (unit.strings[UNITTYPE] == "text") or (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_") then
+				if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic")  or (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_") then
 					local curr = (unit.currcolour % #unit.colours) + 1
 					local c = unit.colours[curr]
 

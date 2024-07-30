@@ -67,11 +67,20 @@ function delunit(unitid)
 			end
 		end
 
-		if (unit.strings[UNITTYPE] == "text") and (codeunits ~= nil) then
+		if ((unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic")) and (codeunits ~= nil) then
 			for i,v in pairs(codeunits) do
 				if (v == unitid) then
 					v = {}
 					table.remove(codeunits, i)
+				end
+			end
+			
+			if (unit.values[TYPE] == 5) then
+				for i,v in pairs(letterunits) do
+					if (v == unitid) then
+						v = {}
+						table.remove(letterunits, i)
+					end
 				end
 			end
 		end
@@ -198,6 +207,10 @@ function getname(unit,meta_)
 	if (meta == false) and (string.sub(result, 1, 6) == "glyph_") then
 		result = "glyph"
 	end
+	
+	if (meta == false) and (unit.strings[UNITTYPE] == "logic") then
+		result = "logic"
+	end
 
 	return result
 end
@@ -275,7 +288,7 @@ function update(unitid,x,y,dir_)
 				dynamicat(oldx,oldy)
 			end
 
-			if (unittype == "text") or isglyph(unit) or (unittype == "node") then
+			if (unittype == "text") or isglyph(unit) or (unittype == "node") or (unittype == "logic") then
 				updatecode = 1
 			end
 
@@ -309,7 +322,7 @@ function updatedir(unitid,dir,noundo_)
 			end
 			unit.values[DIR] = dir
 
-			if (unittype == "text") or isglyph(unit) or (unittype == "node") then
+			if (unittype == "text") or isglyph(unit) or (unittype == "node") or (unittype == "logic") then
 				updatecode = 1
 			end
 		end
@@ -350,6 +363,9 @@ function findall(name_,ignorebroken_,just_testing_)
 			end
 		end
 		checklist = q
+		meta = false
+	elseif (name == "logic") then
+		checklist = codeunits
 		meta = false
 	end
 
@@ -418,23 +434,19 @@ function inside(name,x,y,dir_,unitid,leveldata_)
 				if (object ~= "text") and (object ~= "glyph") and (object ~= "event") and (object ~= "node") and (string.sub(object,1,5) ~= "text_") then
 					for a,mat in pairs(objectlist) do
 						if (a == object) and (object ~= "empty") then
-							if (object ~= "all") and (string.sub(object, 1, 5) ~= "group") then
+							if (object ~= "all") and (object ~= "logic") and (string.sub(object, 1, 5) ~= "group") then
 								create(object,x,y,dir,nil,nil,nil,nil,leveldata)
+							elseif (object == "logic") and getmat("logic_" .. name) ~= nil then
+								create("logic_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
 							elseif (object == "all") then
 								createall(v,x,y,unitid,nil,leveldata)
 							end
 						end
 					end
-				elseif (object == "text") then
-					create("text_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
 				elseif (string.sub(object,1,5) == "text_") then
 					create(object,x,y,dir,nil,nil,nil,nil,leveldata)
-				elseif (object == "event") then
-					create("event_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
-				elseif (object == "node") then
-					create("node_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
-				elseif (object == "glyph") then
-					create("glyph_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
+				elseif (object == "text") or (object == "event") or (object == "node") or (object == "glyph") then
+					create(object .. "_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
 				end
 			end
 		end
@@ -506,7 +518,7 @@ function findnoun(noun_,list_)
 	local list = list_ or nlist.full
 
 	for i,v in ipairs(list) do
-		if (v == noun) or ((v == "group") and (string.sub(noun, 1, 5) == "group")) or ((v == "node") and (string.sub(noun, 1, 5) == "node_")) or ((v == "glyph") and (string.sub(noun, 1, 6) == "glyph_")) then
+		if (v == noun) or ((v == "group") and (string.sub(noun, 1, 5) == "group")) or ((v == "node") and (string.sub(noun, 1, 5) == "node_")) or ((v == "glyph") and (string.sub(noun, 1, 6) == "glyph_")) or ((v == "logic") and (string.sub(noun, 1, 6) == "logic_")) then
 			return true
 		end
 	end

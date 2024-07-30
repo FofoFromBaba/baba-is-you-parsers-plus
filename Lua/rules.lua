@@ -112,7 +112,9 @@ function code(alreadyrun_)
 							if (#hm == 0) and (#hm2 > 0) then
 								--MF_alert("Added " .. unit.strings[UNITNAME] .. " to firstwords, dir " .. tostring(i))
 
-								if not isglyph(unit) then
+								if unit.strings[UNITTYPE] == "logic" then
+									table.insert(firstwords, {{unitid}, i, 1, "logic", 0, {}})
+								elseif not isglyph(unit) then
 									table.insert(firstwords, {{unitid}, i, 1, unit.strings[UNITNAME], unit.values[TYPE], {}})
 								else
 									table.insert(firstwords, {{unitid}, i, 1, "glyph", 0, {}})
@@ -176,6 +178,7 @@ function code(alreadyrun_)
 					parsearrows(breakunitresult)
 				end
 				docode(firstwords,wordunits)
+				dologic(flowunits)
 				dorb()
 				subrules()
 				grouprules()
@@ -189,6 +192,7 @@ function code(alreadyrun_)
 				local newwordunits,newwordidentifier,wordrelatedunits = findwordunits()
 				local newsymbolunits,newsymbolidentifier,newsymbolrelatedunits = findsymbolunits()
 				local newbreakunits,newbreakidentifier,breakrelatedunits = findbreakunits()
+				local newflowunits,newflowidentifier,flowrelatedunits = findflowunits()
 
 				--MF_alert("ID comparison: " .. newwordidentifier .. " - " .. wordidentifier)
 
@@ -196,6 +200,9 @@ function code(alreadyrun_)
 					updatecode = 1
 					code(true)
 				elseif (newsymbolidentifier ~= symbolidentifier) then
+					updatecode = 1
+					code(true)
+				elseif (newflowidentifier ~= flowidentifier) then
 					updatecode = 1
 					code(true)
 				else
@@ -2132,10 +2139,12 @@ function codecheck(unitid,ox,oy,cdir_,ignore_end_,wordunitresult_)
 						if valid then
 							if v.strings[UNITTYPE] == "node" then
 								table.insert(result, {{b}, w, "node", v.values[TYPE], cdir})
-							elseif not isglyph(v) then
-								table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
 							elseif (v.strings[UNITTYPE] == "obj") then
 								table.insert(result, {{b}, w, "obj", v.values[TYPE], cdir})
+							elseif (v.strings[UNITTYPE] == "logic") then
+								table.insert(result, {{b}, w, "logic", v.values[TYPE], cdir})
+							elseif not isglyph(v) then
+								table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
 							else
 								table.insert(result, {{b}, w, "glyph", 0, cdir})
 							end
@@ -2962,7 +2971,7 @@ function findwordunits()
 			local subid = ""
 
 			if (rule[2] == "is") then
-				if ((objectlist[name] ~= nil) or (name == "obj") or ((name == "glyph") and (#glyphunits > -1))) and (name ~= "text") and (alreadydone[name] == nil) then
+				if ((objectlist[name] ~= nil) or (name == "obj") or (name == "logic") or ((name == "glyph") and (#glyphunits > -1))) and (name ~= "text") and (alreadydone[name] == nil) then
 					local these = findall({name,{}})
 					alreadydone[name] = 1
 
@@ -3163,7 +3172,7 @@ function postrules(alreadyrun_)
 							if (b ~= 0) then
 								local bunit = mmf.newObject(b)
 
-								if (bunit.strings[UNITTYPE] == "text" or bunit.strings[UNITTYPE] == "node") or (string.sub(bunit.strings[UNITNAME], 1, 6) == "glyph_") then
+								if (bunit.strings[UNITTYPE] == "text" or bunit.strings[UNITTYPE] == "node" or bunit.strings[UNITTYPE] == "logic") or (string.sub(bunit.strings[UNITNAME], 1, 6) == "glyph_") then
 									bunit.active = true
 									setcolour(b,"active")
 								end
@@ -3226,11 +3235,15 @@ function postrules(alreadyrun_)
 					table.insert(targetlists, "inscribe")
 				end
 
+				if (verb == "is") and (neweffect == "logic") and (featureindex["log"] ~= nil) then
+					table.insert(targetlists, "log")
+				end
+
 				for e,g in ipairs(targetlists) do
 					for a,b in ipairs(featureindex[g]) do
 						local same = comparerules(newbaserule,b[1])
 
-						if same or ((g == "inscribe") and (target == b[1][1]) and (b[1][2] == "inscribe")) or ((g == "write") and (target == b[1][1]) and (b[1][2] == "write")) or ((((neweffect == "text") and (string.sub(b[1][3], 1, 5)=="text_")) or ((neweffect == "glyph") and (string.sub(b[1][3], 1, 6)=="glyph_"))) and (target == b[1][1]) and (verb == b[1][2])) then
+						if same or ((g == "inscribe") and (target == b[1][1]) and (b[1][2] == "inscribe")) or (((g == "write") or (g == "log")) and (target == b[1][1]) and ((b[1][2] == "write") or (b[1][2] == "log"))) or ((((neweffect == "text") and (string.sub(b[1][3], 1, 5)=="text_")) or ((neweffect == "glyph") and (string.sub(b[1][3], 1, 6)=="glyph_"))) and (target == b[1][1]) and (verb == b[1][2])) then
 							--MF_alert(rule[1] .. ", " .. rule[2] .. ", " .. neweffect .. ": " .. b[1][1] .. ", " .. b[1][2] .. ", " .. b[1][3])
 							local theseconds = b[2]
 
@@ -3313,7 +3326,7 @@ function postrules(alreadyrun_)
 						local targetconds = rules[2]
 						local object = targetrule[3]
 
-						if (targetrule[1] == target) and (((targetrule[2] == "is") and (target ~= object)) or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or ((targetrule[2] == "write") and (string.sub(object, 1, 4) ~= "not "))) and ((getmat(object) ~= nil) or (getmat_text(object) ~= false) or (object == "revert") or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or ((targetrule[2] == "write") and (string.sub(object, 1, 4) ~= "not "))) and (string.sub(object, 1, 5) ~= "group") then
+						if (targetrule[1] == target) and (((targetrule[2] == "is") and (target ~= object)) or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log")) and (string.sub(object, 1, 4) ~= "not "))) and ((getmat(object) ~= nil) or (getmat_text(object) ~= false) or (object == "revert") or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log")) and (string.sub(object, 1, 4) ~= "not "))) and (string.sub(object, 1, 5) ~= "group") then
 							if (#newconds > 0) then
 								if (newconds[1] == "never") then
 									targetconds = {}
