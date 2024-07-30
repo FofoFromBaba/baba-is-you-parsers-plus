@@ -212,10 +212,6 @@ function getname(unit,meta_)
 		result = "logic"
 	end
 
-	if (meta == false) and (unit.strings[UNITTYPE] == "obj") then
-		result = "obj"
-	end
-
 	return result
 end
 
@@ -345,8 +341,6 @@ function findall(name_,ignorebroken_,just_testing_)
 	if (name == "text") then
 		checklist = codeunits
 		meta = false
-	elseif (name == "obj") then
-		meta = false
 	elseif (name == "glyph") then
 		checklist = glyphunits
 		meta = false
@@ -440,12 +434,10 @@ function inside(name,x,y,dir_,unitid,leveldata_)
 				if (object ~= "text") and (object ~= "glyph") and (object ~= "event") and (object ~= "node") and (string.sub(object,1,5) ~= "text_") then
 					for a,mat in pairs(objectlist) do
 						if (a == object) and (object ~= "empty") then
-							if (object ~= "all") and (object ~= "logic") and (object ~= "obj") and (string.sub(object, 1, 5) ~= "group") then
+							if (object ~= "all") and (object ~= "logic") and (string.sub(object, 1, 5) ~= "group") then
 								create(object,x,y,dir,nil,nil,nil,nil,leveldata)
 							elseif (object == "logic") and getmat("logic_" .. name) ~= nil then
 								create("logic_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
-							elseif (object == "obj") and getmat("obj_" .. name) ~= nil then
-								create("obj_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
 							elseif (object == "all") then
 								createall(v,x,y,unitid,nil,leveldata)
 							end
@@ -526,7 +518,7 @@ function findnoun(noun_,list_)
 	local list = list_ or nlist.full
 
 	for i,v in ipairs(list) do
-		if (v == noun) or ((v == "group") and (string.sub(noun, 1, 5) == "group")) or ((v == "node") and (string.sub(noun, 1, 5) == "node_")) or ((v == "glyph") and (string.sub(noun, 1, 6) == "glyph_")) or ((v == "logic") and (string.sub(noun, 1, 6) == "logic_")) or ((v == "obj") and (string.sub(noun, 1, 4) == "obj_")) then
+		if (v == noun) or ((v == "group") and (string.sub(noun, 1, 5) == "group")) or ((v == "node") and (string.sub(noun, 1, 5) == "node_")) or ((v == "glyph") and (string.sub(noun, 1, 6) == "glyph_")) or ((v == "logic") and (string.sub(noun, 1, 6) == "logic_")) then
 			return true
 		end
 	end

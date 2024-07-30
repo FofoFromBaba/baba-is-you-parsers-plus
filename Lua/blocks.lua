@@ -1630,10 +1630,6 @@ function moveblock(onlystartblock_)
 							name = "logic"
 						end
 
-						if (unit.strings[UNITTYPE] == "obj") then
-							name = "obj"
-						end
-
 						if (featureindex[name] ~= nil) then
 							for a,b in ipairs(featureindex[name]) do
 								local baserule = b[1]
@@ -2643,7 +2639,7 @@ function block(small_)
 
 				local exists = false
 
-				if (v ~= "text") and (v ~= "glyph") and (v ~= "all") and (v ~= "event") and (v ~= "node") and (v ~= "logic") and (v ~= "obj") then
+				if (v ~= "text") and (v ~= "glyph") and (v ~= "all") and (v ~= "event") and (v ~= "node") and (v ~= "logic") then
 					for b,mat in pairs(objectlist) do
 						if (b == v) then
 							exists = true
@@ -2656,12 +2652,6 @@ function block(small_)
 				elseif (v == "logic") then
 					for b,mat in pairs(objectlist) do
 						if (b == "logic_" .. name) then
-							exists = true
-						end
-					end
-				elseif (v == "obj") then
-					for b,mat in pairs(objectlist) do
-						if (b == "obj_" .. name) then
 							exists = true
 						end
 					end
@@ -2715,12 +2705,7 @@ function block(small_)
 								create("logic_" .. name,x,y,dir,x,y,nil,nil,leveldata)
 								updatecode = 1
 							end
-						elseif (v == "obj") then
-							if (name ~= "obj") and (name ~= "all") then
-								create("obj_" .. name,x,y,dir,x,y,nil,nil,leveldata)
-								updatecode = 1
-							end
-						elseif (string.sub(v, 1, 5) == "text_") or (string.sub(v, 1, 6) == "glyph_") or (string.sub(v, 1, 6) == "event_") or (string.sub(v, 1, 5) == "node_") or (string.sub(v, 1, 6) == "logic_") or (string.sub(v, 1, 4) == "obj_") then
+						elseif (string.sub(v, 1, 5) == "text_") or (string.sub(v, 1, 6) == "glyph_") or (string.sub(v, 1, 6) == "event_") or (string.sub(v, 1, 5) == "node_") or (string.sub(v, 1, 6) == "logic_") then
 							create(v,x,y,dir,x,y,nil,nil,leveldata)
 						elseif (string.sub(v, 1, 5) == "group") then
 							--[[
