@@ -169,7 +169,7 @@ function convert(stuff,mats,dolevels_)
 							elseif (op == "becobj") then
 								mat2 = "obj_" .. matdata[1]
 							elseif (op == "inscribe") then
-								mat2 = "glyph_" .. matdata[1
+								mat2 = "glyph_" .. matdata[1]
 							elseif (op == "log") then
 								mat2 = "logic_" .. matdata[1]
 							elseif (mat2 == "deobj") then
