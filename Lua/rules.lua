@@ -526,17 +526,27 @@ function parsearrows(breakunitresult)
 	notunitids = {}
 	notnils = {}
 	local nils
+	local alsodo
+	local starts = {}
 	for unitid, _ in pairs(isarrow) do
 		local unit = mmf.newObject(unitid)
-		local dir = unit.values[DIR]
+		if node_types[unit.strings[UNITNAME]:sub(6, -1)] ~= -1 then
+			table.insert(starts, {unitid, unit.values[XPOS], unit.values[YPOS], unit.values[DIR], {}})
+		end
+	end
+	while #starts ~= 0 do
+		local start = table.remove(starts)
+		local unitid = start[1]
+		local xpos = start[2]
+		local ypos = start[3]
+		local dir = start[4]
+		local unit = mmf.newObject(unitid)
 		local drs = ndirs[dir + 1]
 		local ox,oy = drs[1],drs[2]
-		local xpos,ypos = unit.values[XPOS],unit.values[YPOS]
 		xpos = xpos + ox
 		ypos = ypos + oy
 		local done = false
-		nils = {}
-		nots = {}
+		nils = start[5]
 		while xpos > 0 and xpos < roomsizex and ypos > 0 and ypos < roomsizey do
 			for i, unitid2 in ipairs(findallhere(xpos, ypos)) do
 				if breakunitresult[unitid2] == 1 then
@@ -546,10 +556,43 @@ function parsearrows(breakunitresult)
 				if isarrow[unitid2] then
 					local unit2 = mmf.newObject(unitid2)
 					if node_types[unit2.strings[UNITNAME]:sub(6, -1)] == -1 then
-						dir = unit2.values[DIR]
-						drs = ndirs[dir + 1]
-						ox,oy = drs[1],drs[2]
-						table.insert(nils, unitid2)
+						for i, v in ipairs(nils) do
+							if v == unitid2 then
+								goto abort
+							end
+						end
+						local nodename = unit2.strings[UNITNAME]:sub(6, -1)
+						if nodename == "nil" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+						elseif nodename == "nil_perp" then
+							dir = (unit2.values[DIR] + 1) % 4
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 3) % 4, table_copy(nils)})
+						elseif nodename == "nil_branch" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 3) % 4, table_copy(nils)})
+						elseif nodename == "nil_debranch" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 1) % 4, table_copy(nils)})
+						elseif nodename == "nil_spread" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 1) % 4, table_copy(nils)})
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 3) % 4, table_copy(nils)})
+						end
 					elseif node_types[unit.strings[UNITNAME]:sub(6, -1)] == 4 then
 						pointedby[unitid2] = pointedby[unitid2] or {}
 						table.insert(pointedby[unitid2], unitid)
@@ -579,6 +622,7 @@ function parsearrows(breakunitresult)
 			xpos = xpos + ox
 			ypos = ypos + oy
 		end
+		::abort::
 	end
 
 	for i, unitid in ipairs(firstarrows) do
