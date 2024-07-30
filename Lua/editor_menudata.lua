@@ -199,7 +199,7 @@ menufuncs.currobjlist =
 							
 							if (ut == "object") then
 								c = getactualdata_objlist(obj.object, "colour")
-							elseif (ut == "text") or (ut == "node") or (ut == "obj") then
+							elseif (ut == "text") or (ut == "node") or (ut == "logic") or (ut == "obj") then
 								c = getactualdata_objlist(obj.object, "active")
 							end
 							
@@ -326,3 +326,33 @@ menufuncs.currobjlist =
 				MF_currobjlist_backdel()
 			end,
 	}
+
+
+function hotbar_updatethumbnail(object,thumbid,slotid)
+	local thumb = mmf.newObject(thumbid)
+	
+	if (string.len(object) > 0) then
+		local sprite = getactualdata_objlist(object,"sprite")
+		local sprite_in_root = getactualdata_objlist(object,"sprite_in_root")
+		local colour = getactualdata_objlist(object,"colour")
+		local colour_a = getactualdata_objlist(object,"active")
+		local tiletype = getactualdata_objlist(object,"unittype")
+		
+		local path = "Data/Sprites/"
+		if (sprite_in_root == false) then
+			path = "Data/Worlds/" .. generaldata.strings[WORLD] .. "/Sprites/"
+		end
+		
+		MF_thumbnail_loadimage(thumbid,0,slotid,path .. sprite .. "_0_1.png")
+		
+		if (tiletype == "object") then
+			MF_setcolour(thumbid, colour[1], colour[2])
+		else
+			MF_setcolour(thumbid, colour_a[1], colour_a[2])
+		end
+		
+		thumb.visible = true
+	else
+		thumb.visible = false
+	end
+end

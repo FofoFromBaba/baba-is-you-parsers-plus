@@ -112,7 +112,9 @@ function code(alreadyrun_)
 							if (#hm == 0) and (#hm2 > 0) then
 								--MF_alert("Added " .. unit.strings[UNITNAME] .. " to firstwords, dir " .. tostring(i))
 
-								if not isglyph(unit) then
+								if unit.strings[UNITTYPE] == "logic" then
+									table.insert(firstwords, {{unitid}, i, 1, "logic", 0, {}})
+								elseif not isglyph(unit) then
 									table.insert(firstwords, {{unitid}, i, 1, unit.strings[UNITNAME], unit.values[TYPE], {}})
 								else
 									table.insert(firstwords, {{unitid}, i, 1, "glyph", 0, {}})
@@ -176,6 +178,7 @@ function code(alreadyrun_)
 					parsearrows(breakunitresult)
 				end
 				docode(firstwords,wordunits)
+				dologic(flowunits)
 				dorb()
 				subrules()
 				grouprules()
@@ -189,6 +192,7 @@ function code(alreadyrun_)
 				local newwordunits,newwordidentifier,wordrelatedunits = findwordunits()
 				local newsymbolunits,newsymbolidentifier,newsymbolrelatedunits = findsymbolunits()
 				local newbreakunits,newbreakidentifier,breakrelatedunits = findbreakunits()
+				local newflowunits,newflowidentifier,flowrelatedunits = findflowunits()
 
 				--MF_alert("ID comparison: " .. newwordidentifier .. " - " .. wordidentifier)
 
@@ -196,6 +200,9 @@ function code(alreadyrun_)
 					updatecode = 1
 					code(true)
 				elseif (newsymbolidentifier ~= symbolidentifier) then
+					updatecode = 1
+					code(true)
+				elseif (newflowidentifier ~= flowidentifier) then
 					updatecode = 1
 					code(true)
 				else
@@ -526,17 +533,27 @@ function parsearrows(breakunitresult)
 	notunitids = {}
 	notnils = {}
 	local nils
+	local alsodo
+	local starts = {}
 	for unitid, _ in pairs(isarrow) do
 		local unit = mmf.newObject(unitid)
-		local dir = unit.values[DIR]
+		if node_types[unit.strings[UNITNAME]:sub(6, -1)] ~= -1 then
+			table.insert(starts, {unitid, unit.values[XPOS], unit.values[YPOS], unit.values[DIR], {}})
+		end
+	end
+	while #starts ~= 0 do
+		local start = table.remove(starts)
+		local unitid = start[1]
+		local xpos = start[2]
+		local ypos = start[3]
+		local dir = start[4]
+		local unit = mmf.newObject(unitid)
 		local drs = ndirs[dir + 1]
 		local ox,oy = drs[1],drs[2]
-		local xpos,ypos = unit.values[XPOS],unit.values[YPOS]
 		xpos = xpos + ox
 		ypos = ypos + oy
 		local done = false
-		nils = {}
-		nots = {}
+		nils = start[5]
 		while xpos > 0 and xpos < roomsizex and ypos > 0 and ypos < roomsizey do
 			for i, unitid2 in ipairs(findallhere(xpos, ypos)) do
 				if breakunitresult[unitid2] == 1 then
@@ -546,10 +563,43 @@ function parsearrows(breakunitresult)
 				if isarrow[unitid2] then
 					local unit2 = mmf.newObject(unitid2)
 					if node_types[unit2.strings[UNITNAME]:sub(6, -1)] == -1 then
-						dir = unit2.values[DIR]
-						drs = ndirs[dir + 1]
-						ox,oy = drs[1],drs[2]
-						table.insert(nils, unitid2)
+						for i, v in ipairs(nils) do
+							if v == unitid2 then
+								goto abort
+							end
+						end
+						local nodename = unit2.strings[UNITNAME]:sub(6, -1)
+						if nodename == "nil" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+						elseif nodename == "nil_perp" then
+							dir = (unit2.values[DIR] + 1) % 4
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 3) % 4, table_copy(nils)})
+						elseif nodename == "nil_branch" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 3) % 4, table_copy(nils)})
+						elseif nodename == "nil_debranch" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 1) % 4, table_copy(nils)})
+						elseif nodename == "nil_spread" then
+							dir = unit2.values[DIR]
+							drs = ndirs[dir + 1]
+							ox,oy = drs[1],drs[2]
+							table.insert(nils, unitid2)
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 1) % 4, table_copy(nils)})
+							table.insert(starts, {unitid, xpos, ypos, (unit2.values[DIR] + 3) % 4, table_copy(nils)})
+						end
 					elseif node_types[unit.strings[UNITNAME]:sub(6, -1)] == 4 then
 						pointedby[unitid2] = pointedby[unitid2] or {}
 						table.insert(pointedby[unitid2], unitid)
@@ -579,6 +629,7 @@ function parsearrows(breakunitresult)
 			xpos = xpos + ox
 			ypos = ypos + oy
 		end
+		::abort::
 	end
 
 	for i, unitid in ipairs(firstarrows) do
@@ -2089,10 +2140,12 @@ function codecheck(unitid,ox,oy,cdir_,ignore_end_,wordunitresult_)
 						if valid then
 							if v.strings[UNITTYPE] == "node" then
 								table.insert(result, {{b}, w, "node", v.values[TYPE], cdir})
-							elseif not isglyph(v) then
-								table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
 							elseif (v.strings[UNITTYPE] == "obj") then
 								table.insert(result, {{b}, w, "obj", v.values[TYPE], cdir})
+							elseif (v.strings[UNITTYPE] == "logic") then
+								table.insert(result, {{b}, w, "logic", v.values[TYPE], cdir})
+							elseif not isglyph(v) then
+								table.insert(result, {{b}, w, v.strings[UNITNAME], v.values[TYPE], cdir})
 							else
 								table.insert(result, {{b}, w, "glyph", 0, cdir})
 							end
@@ -2919,7 +2972,7 @@ function findwordunits()
 			local subid = ""
 
 			if (rule[2] == "is") then
-				if ((objectlist[name] ~= nil) or (name == "obj") or ((name == "glyph") and (#glyphunits > -1))) and (name ~= "text") and (alreadydone[name] == nil) then
+				if ((objectlist[name] ~= nil) or (name == "obj") or (name == "logic") or ((name == "glyph") and (#glyphunits > -1))) and (name ~= "text") and (alreadydone[name] == nil) then
 					local these = findall({name,{}})
 					alreadydone[name] = 1
 
@@ -3120,7 +3173,7 @@ function postrules(alreadyrun_)
 							if (b ~= 0) then
 								local bunit = mmf.newObject(b)
 
-								if (bunit.strings[UNITTYPE] == "text" or bunit.strings[UNITTYPE] == "node") or (string.sub(bunit.strings[UNITNAME], 1, 6) == "glyph_") then
+								if (bunit.strings[UNITTYPE] == "text" or bunit.strings[UNITTYPE] == "node" or bunit.strings[UNITTYPE] == "logic") or (string.sub(bunit.strings[UNITNAME], 1, 6) == "glyph_") then
 									bunit.active = true
 									setcolour(b,"active")
 								end
@@ -3183,11 +3236,15 @@ function postrules(alreadyrun_)
 					table.insert(targetlists, "inscribe")
 				end
 
+				if (verb == "is") and (neweffect == "logic") and (featureindex["log"] ~= nil) then
+					table.insert(targetlists, "log")
+				end
+
 				for e,g in ipairs(targetlists) do
 					for a,b in ipairs(featureindex[g]) do
 						local same = comparerules(newbaserule,b[1])
 
-						if same or ((g == "inscribe") and (target == b[1][1]) and (b[1][2] == "inscribe")) or ((g == "write") and (target == b[1][1]) and (b[1][2] == "write")) or ((((neweffect == "text") and (string.sub(b[1][3], 1, 5)=="text_")) or ((neweffect == "glyph") and (string.sub(b[1][3], 1, 6)=="glyph_"))) and (target == b[1][1]) and (verb == b[1][2])) then
+						if same or ((g == "inscribe") and (target == b[1][1]) and (b[1][2] == "inscribe")) or (((g == "write") or (g == "log")) and (target == b[1][1]) and ((b[1][2] == "write") or (b[1][2] == "log"))) or ((((neweffect == "text") and (string.sub(b[1][3], 1, 5)=="text_")) or ((neweffect == "glyph") and (string.sub(b[1][3], 1, 6)=="glyph_"))) and (target == b[1][1]) and (verb == b[1][2])) then
 							--MF_alert(rule[1] .. ", " .. rule[2] .. ", " .. neweffect .. ": " .. b[1][1] .. ", " .. b[1][2] .. ", " .. b[1][3])
 							local theseconds = b[2]
 
@@ -3270,7 +3327,7 @@ function postrules(alreadyrun_)
 						local targetconds = rules[2]
 						local object = targetrule[3]
 
-						if (targetrule[1] == target) and (((targetrule[2] == "is") and (target ~= object)) or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or ((targetrule[2] == "write") and (string.sub(object, 1, 4) ~= "not "))) and ((getmat(object) ~= nil) or (getmat_text(object) ~= false) or (object == "revert") or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or ((targetrule[2] == "write") and (string.sub(object, 1, 4) ~= "not "))) and (string.sub(object, 1, 5) ~= "group") then
+						if (targetrule[1] == target) and (((targetrule[2] == "is") and (target ~= object)) or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log")) and (string.sub(object, 1, 4) ~= "not "))) and ((getmat(object) ~= nil) or (getmat_text(object) ~= false) or (object == "revert") or ((targetrule[2] == "inscribe") and (string.sub(object, 1, 4) ~= "not ")) or (((targetrule[2] == "write") or (targetrule[2] == "log")) and (string.sub(object, 1, 4) ~= "not "))) and (string.sub(object, 1, 5) ~= "group") then
 							if (#newconds > 0) then
 								if (newconds[1] == "never") then
 									targetconds = {}

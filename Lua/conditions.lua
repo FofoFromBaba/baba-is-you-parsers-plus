@@ -42,6 +42,8 @@ function testcond(conds,unitid,x_,y_,autofail_,limit_,checkedconds_,ignorebroken
 
 		if (unit.strings[UNITTYPE] == "text") then
 			name = "text"
+		elseif (unit.strings[UNITTYPE] == "logic") then
+			name = "logic"
 		elseif (unit.strings[UNITTYPE] == "obj") then
 			name = "obj"
 		end
@@ -930,7 +932,7 @@ for i, j in pairs(params) do
 		if (string.sub(unitname, 6) == _params) then
 			return true, checkedconds
 		end
-	elseif (string.sub(unitname, 1, 6) == "glyph_") or (string.sub(unitname, 1, 6) == "event_") then
+	elseif (string.sub(unitname, 1, 6) == "glyph_") or (string.sub(unitname, 1, 6) == "event_") or (string.sub(unitname, 1, 6) == "logic_") then
 		if (string.sub(unitname, 7) == _params) then
 			return true, checkedconds
 		end
