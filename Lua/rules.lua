@@ -22,6 +22,7 @@ function code(alreadyrun_)
 			local wordidentifier = ""
 			wordunits,wordidentifier,wordrelatedunits = findwordunits()
 			symbolunits,symbolidentifier,symbolrelatedunits = findsymbolunits()
+			flowunits,flowidentifier,flowrelatedunits = findflowunits()
 			local wordunitresult = {}
 
 			if (#wordunits > 0) then
