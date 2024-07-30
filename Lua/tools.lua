@@ -336,6 +336,7 @@ function findall(name_,ignorebroken_,just_testing_)
 		meta = false
 	elseif (name == "glyph") then
 		checklist = glyphunits
+		meta = false
 	elseif (name == "node") then
         	checklist = {}
         	meta = false
