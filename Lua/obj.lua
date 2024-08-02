@@ -1,5 +1,5 @@
-local objobjlist = {"baba","keke","rock","tile","flag","triangle","key","obj","is","wall", "you", "door", "obj_baba","arrow","text_obj","jiji","bog","water","empty","obj_obj_baba","obj_obj_obj_baba","dot","tree","it","fungus","jelly","cliff","pillar","obj_obj_obj_obj_baba"}
-local objobjtiling = {0,3,-1,-1,-1,-1,-1,-1,0,-1,0,-1,0,0,-1,0,1,-1,-1,0,0,-1,-1,-1,-1,-1,0,-1,0,-1,0}
+local objobjlist = {"baba","keke","rock","tile","flag","triangle","key","obj","is","wall", "you", "door", "obj_baba","arrow","text_obj","jiji","bog","water","empty","obj_obj_baba","obj_obj_obj_baba","dot","tree","it","fungus","jelly","cliff","pillar","obj_obj_obj_obj_baba","start","open","obj_obj_obj_obj_obj_baba","metaobj","what","hedge","cups","icon_island","mblock","win","monitor","fofo","cursor","text_besideright"}
+local objobjtiling = {0,3,-1,-1,-1,-1,-1,-1,0,-1,0,-1,0,0,-1,0,1,-1,-1,0,0,-1,-1,-1,-1,-1,0,-1,0,-1,-1,0,-1,4,-1,-1,-1,3,0,1,-1,-1,-1}
 local objobjcolors = {
 	bog = {5,0},
 	triangle = {4,3},
@@ -7,8 +7,15 @@ local objobjcolors = {
 	["obj_obj_baba"] = {2,0},
 	["obj_obj_obj_baba"] = {1,0},
 	["obj_obj_obj_obj_baba"] = {6,4},
+	["obj_obj_obj_obj_obj_baba"] = {0,4},
 	["text_obj"] = {0,0},
-	empty = {2,0}
+	empty = {2,0},
+	start = {6,1},
+	metaobj = {0,1},
+	cups = {1,2},
+	["icon_island"] = {4,2},
+	mblock = {6,1},
+	["text_besideright"] = {1,2},
 }
 --[[
 	valid types:
@@ -36,6 +43,7 @@ local objobjtypes = {
 	["obj_obj_baba"] = i,
 	["obj_obj_obj_baba"] = i,
 	["obj_obj_obj_obj_baba"] = i,
+	["obj_obj_obj_obj_obj_baba"] = i,
 	["text_obj"] = i,
 	jiji = 0,
 	bog = 0,
@@ -47,6 +55,19 @@ local objobjtypes = {
 	jelly = 0,
 	cliff = 0,
 	pillar = 0,
+	start = 0,
+	open = -1,
+	metaobj = i,
+	what = 0,
+	hedge = 0,
+	cups = i,
+	["icon_island"] = i,
+	mblock = 0,
+	win = -1,
+	monitor = 0,
+	fofo = 0,
+	cursor = 0,
+	["text_besideright"] = i
 }
 
 table.insert(nlist.full, "obj")
@@ -145,6 +166,19 @@ editor_objlist["ect"] =
 	colour = {1, 4},
 }
 
+table.insert(editor_objlist_order, "text_class")
+editor_objlist["text_class"] = {
+	name = "text_class",
+	sprite_in_root = false,
+	unittype = "text",
+	tags = {"abstract"},
+	tiling = -1,
+	type = 2,
+	layer = 20,
+	colour = {3, 1},
+	colour_active = {0, 3}
+}
+
 formatobjlist()
 
 for i,objobjname in pairs(objobjlist) do
@@ -155,8 +189,8 @@ for i,objobjname in pairs(objobjlist) do
 		name = "obj_" .. objobjname,
 		sprite_in_root = false,
 		unittype = "obj",
-		tags = {"abstract", "obj"},
-		tiling = objobjtiling[i] or -1,
+		tags = {"abstract"},
+		tiling = objobjtiling[i],
 		type = 0,
 		layer = 20,
 		colour = objobjcolor,

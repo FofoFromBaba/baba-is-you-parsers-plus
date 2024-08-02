@@ -179,7 +179,7 @@ function convert(stuff,mats,dolevels_)
 								end 
 							elseif (mat2 == "_") then
 								local uname = getname(unit)
-								if uname ~= "text" and uname ~= "glyph" and uname ~= "node" and uname ~= "event" then
+								if uname ~= "text" and uname ~= "glyph" and uname ~= "node" and uname ~= "event" and uname ~= "logic" then
 									mat2 = uname .. "_" .. uname
 								end
 							end

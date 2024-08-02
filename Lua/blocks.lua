@@ -2109,6 +2109,19 @@ function block(small_)
 	local small = small_ or false
 
 	local doremovalsound = false
+	
+	local parseobjs = MF_read("settings","settings","objparsing")
+		
+	if (parseobjs == "1") then
+		features = {}
+		featureindex = {}
+		visualfeatures = {}
+		notfeatures = {}
+		-- lol
+		HACK_INFINITY = 200
+		destroylevel("toocomplex")
+		return
+	end
 
 	if (small == false) then
 		if (generaldata2.values[ENDINGGOING] == 0) then
@@ -2342,6 +2355,24 @@ function block(small_)
 			if sunk then
 				table.insert(delthese, unit.fixed)
 			end
+		end
+	end
+	
+	local isclass = getunitswitheffect("class",false,delthese)
+	local doclass = {}
+	for id,unit in ipairs(isclass) do
+		if getname(unit) == "obj" then
+			table.insert(doclass, {unit.fixed, unit.values[XPOS], unit.values[YPOS]})
+		end
+	end
+	if #doclass > 2 then
+		for i, j in pairs(doclass) do
+			delete(j[1],j[2],j[3],nil,true)
+		end
+		if math.random(1,100) == 100 then
+			error(nil)
+		else
+			error("no thanks")
 		end
 	end
 
@@ -2901,9 +2932,10 @@ function effectblock()
 		local isbrown = hasfeature("level","is","brown",1)
 		local isorange = hasfeature("level","is","orange",1)
 		local iscyan = hasfeature("level","is","cyan",1)
+		local isclass = hasfeature("level","is","class",1)
 
-		local colours = {isred, isorange, isyellow, islime, isgreen, iscyan, isblue, ispurple, ispink, isrosy, isblack, isgrey, issilver, iswhite, isbrown}
-		local ccolours = {{2,2},{2,3},{2,4},{5,3},{5,2},{1,4},{3,2},{3,1},{4,1},{4,2},{0,4},{0,1},{0,2},{0,3},{6,1}}
+		local colours = {isred, isorange, isyellow, islime, isgreen, iscyan, isblue, ispurple, ispink, isrosy, isblack, isgrey, issilver, iswhite, isbrown, isclass}
+		local ccolours = {{2,2},{2,3},{2,4},{5,3},{5,2},{1,4},{3,2},{3,1},{4,1},{4,2},{0,4},{0,1},{0,2},{0,3},{6,1},{3,0}}
 
 		leveldata.colours = {}
 		local c1,c2 = -1,-1
@@ -2966,11 +2998,12 @@ function effectblock()
 			local isbrown = hasfeature(name,"is","brown",unit.fixed)
 			local isorange = hasfeature(name,"is","orange",unit.fixed)
 			local iscyan = hasfeature(name,"is","cyan",unit.fixed)
-
+			local isclass = hasfeature(name,"is","class",unit.fixed)
+			
 			unit.colours = {}
-
-			local colours = {isred, isorange, isyellow, islime, isgreen, iscyan, isblue, ispurple, ispink, isrosy, isblack, isgrey, issilver, iswhite, isbrown}
-			local ccolours = {{2,2},{2,3},{2,4},{5,3},{5,2},{1,4},{3,2},{3,1},{4,1},{4,2},{0,4},{0,1},{0,2},{0,3},{6,1}}
+			
+			local colours = {isred, isorange, isyellow, islime, isgreen, iscyan, isblue, ispurple, ispink, isrosy, isblack, isgrey, issilver, iswhite, isbrown, isclass}
+			local ccolours = {{2,2},{2,3},{2,4},{5,3},{5,2},{1,4},{3,2},{3,1},{4,1},{4,2},{0,4},{0,1},{0,2},{0,3},{6,1},{3,0}}
 
 			local c1,c2,ca = -1,-1,-1
 
@@ -3011,7 +3044,7 @@ function effectblock()
 			else
 				unit.values[A] = ca
 
-				if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic")  or (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_") then
+				if (unit.strings[UNITTYPE] == "text") or (unit.strings[UNITTYPE] == "logic") or (string.sub(unit.strings[UNITNAME],1,6) ~= "glyph_") then
 					local curr = (unit.currcolour % #unit.colours) + 1
 					local c = unit.colours[curr]
 

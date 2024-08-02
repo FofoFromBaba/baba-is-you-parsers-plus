@@ -444,10 +444,14 @@ function inside(name,x,y,dir_,unitid,leveldata_)
 								create(object,x,y,dir,nil,nil,nil,nil,leveldata)
 							elseif (object == "logic") and getmat("logic_" .. name) ~= nil then
 								create("logic_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
-							elseif (object == "obj") and getmat("obj_" .. name) ~= nil then
-								create("obj_" .. name,x,y,dir,nil,nil,nil,nil,leveldata)
 							elseif (object == "all") then
 								createall(v,x,y,unitid,nil,leveldata)
+							elseif (object == "obj") then
+								if getmat_text("obj_" .. uname) then
+									create("obj_" .. uname,x,y,dir,nil,nil,nil,nil,leveldata)
+								elseif getmat_text("obj_obj") then
+									create("obj_obj",x,y,dir,nil,nil,nil,nil,leveldata)
+								end
 							end
 						end
 					end

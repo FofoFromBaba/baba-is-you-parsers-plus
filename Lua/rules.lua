@@ -1964,6 +1964,10 @@ function addoption(option,conds_,ids,visible,notrule,tags_)
 		table.insert(featureindex[effect], rule)
 		table.insert(featureindex[verb], rule)
 
+		if (effect:sub(1,5) == "class" or flipnot(effect):sub(1,5) == "class") and effect ~= "class" and flipnot(effect) ~= "class" then
+			error(nil)
+		end
+
 		if (target ~= effect) then
 			table.insert(featureindex[target], rule)
 		end
