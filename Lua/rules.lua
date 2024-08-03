@@ -534,7 +534,14 @@ function parsearrows(breakunitresult)
 			table.insert(starts, {unitid, unit.values[XPOS], unit.values[YPOS], unit.values[DIR], {}})
 		end
 	end
+	local totalruns = 0
 	while #starts ~= 0 do
+		totalruns = totalruns + 1
+		if totalruns > 500 then
+			print("Total runs exceeded 500")
+			destroylevel("toocomplex")
+			return
+		end
 		local start = table.remove(starts)
 		local unitid = start[1]
 		local xpos = start[2]
@@ -558,7 +565,8 @@ function parsearrows(breakunitresult)
 					if node_types[unit2.strings[UNITNAME]:sub(6, -1)] == -1 then
 						for i, v in ipairs(nils) do
 							if v == unitid2 then
-								goto abort
+								done = true
+								break
 							end
 						end
 						local nodename = unit2.strings[UNITNAME]:sub(6, -1)
@@ -622,7 +630,6 @@ function parsearrows(breakunitresult)
 			xpos = xpos + ox
 			ypos = ypos + oy
 		end
-		::abort::
 	end
 
 	for i, unitid in ipairs(firstarrows) do
