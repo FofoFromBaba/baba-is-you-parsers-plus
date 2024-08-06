@@ -237,7 +237,7 @@ function findtype(typedata,x,y,unitid_,just_testing_)
 			if (v ~= unitid) then
 				local unit = mmf.newObject(v)
 
-				if (unit.strings[UNITNAME] == name) or ((unit.strings[UNITTYPE] == "text") and (name == "text")) or ((unit.strings[UNITTYPE] == "node") and (name == "node")) or (isglyph(unit) and (name == "glyph")) or (string.sub(unit.strings[UNITNAME], 1, 6) == "event_" and (name == "event")) then
+				if (unit.strings[UNITNAME] == name) or ((unit.strings[UNITTYPE] == "text") and (name == "text")) or ((unit.strings[UNITTYPE] == "node") and (name == "node")) or ((unit.strings[UNITTYPE] == "obj") and (name == "obj")) or (isglyph(unit) and (name == "glyph")) or (string.sub(unit.strings[UNITNAME], 1, 6) == "event_" and (name == "event")) then
 					if testcond(conds,v) then
 						table.insert(result, v)
 
