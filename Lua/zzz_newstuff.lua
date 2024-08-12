@@ -156,8 +156,8 @@ editor_objlist["text_refers"] =
 	tiling = -1,
 	type = 7,
 	layer = 1,
-	colour = {1, 2},
-	colour_active = {1, 4},
+	colour = {0, 1},
+	colour_active = {0, 3},
 	argtype = {0,2,-1}
 }
 
@@ -170,8 +170,8 @@ editor_objlist["glyph_refers"] =
 	tiling = -1,
 	type = 0,
 	layer = 1,
-	colour = {1, 2},
-	colour_active = {1, 4},
+	colour = {0, 1},
+	colour_active = {0, 3},
 }
 
 editor_objlist["event_refers"] =
@@ -183,8 +183,8 @@ editor_objlist["event_refers"] =
 	tiling = -1,
 	type = 0,
 	layer = 20,
-	colour = {1, 2},
-	colour_active = {1, 4},
+	colour = {0, 1},
+	colour_active = {0, 3},
 }
 
 editor_objlist["text__NONE_"] = 
@@ -202,7 +202,7 @@ editor_objlist["text__NONE_"] =
 
 add_node(false, "glyph", 0, {3, 2}, {3, 3})
 add_node(false, "event", 0, {5, 2}, {5, 3})
-add_node(false, "refers", 7, {1, 2}, {1, 4}, {0, 2})
+add_node(false, "refers", 7, {0, 1}, {0, 3}, {0, 2})
 add_node(false, "obj", 0, {0, 1}, {0, 2}, {0, 2})
 
 editor_objlist["text_metaobj"] =

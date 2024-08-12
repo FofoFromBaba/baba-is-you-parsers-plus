@@ -31,25 +31,9 @@ editor_objlist["text_log"] =
 	argtype = {0, 2}
 }
 
---[[table.insert(editor_objlist_order, "text_flow")
-
-editor_objlist["text_flow"] = 
-{
-	name = "text_flow",
-	sprite_in_root = false,
-	unittype = "text",
-	tags = {""},
-	tiling = -1,
-	type = 2,
-	layer = 20,
-	colour = {4, 0},
-	colour_active = {4, 2},
-}]]
-
 table.insert(nlist.full, "logic")
 table.insert(nlist.short, "logic")
 table.insert(nlist.objects, "logic")
-table.insert(nlist.brief, "logic")
 
 logic_types = {}
 logic_argtypes = {}
@@ -84,6 +68,7 @@ addlogic("omnistart",10,{3,0},{4,2},{},-1)
 addlogic("connect",-1,{0,1},{0,3},{},0)
 addlogic("omniconnect",9,{0,1},{0,3},{},-1)
 addlogic("longconnect",-4,{0,1},{0,3},{},0)
+addlogic("omnilongconnect",13,{0,1},{0,3},{},-1)
 
 --wireless connecters
 addlogic("send",-3,{3,2},{3,3},{},-1)
@@ -92,6 +77,17 @@ addlogic("send2",-3,{2,1},{2,2},{},-1)
 addlogic("recieve2",-2,{2,1},{2,2},{},-1)
 addlogic("send3",-3,{5,2},{5,3},{},-1)
 addlogic("recieve3",-2,{5,2},{5,3},{},-1)
+
+--verbs
+addlogic("is",1,{0,1},{0,3},{0,2},-1)
+addlogic("has",1,{0,1},{0,3},{0},-1)
+addlogic("eat",1,{2,1},{2,2},{0},-1)
+addlogic("fear",1,{2,1},{2,2},{0},-1)
+addlogic("follow",1,{5,1},{5,3},{0},-1)
+addlogic("make",1,{0,1},{0,3},{0},-1)
+addlogic("mimic",1,{2,1},{2,2},{0},-1)
+addlogic("write",1,{0,1},{0,3},{0,2},-1)
+addlogic("log",1,{0,1},{0,3},{0,2},-1)
 
 --prefixes
 addlogic("idle",6,{2,2},{2,3},{},-1)
@@ -122,9 +118,10 @@ addlogic("false",5,{2,1},{2,2},{},0)
 addlogic("omnifalse",8,{2,2},{2,3},{},-1)
 
 --not
---addlogic("not",7,{2,1},{2,2},{},-1)
+addlogic("not",7,{2,1},{2,2},{},-1)
 
 --halt
+addlogic("halt",11,{2,0},{2,1},{},0)
 addlogic("omnihalt",12,{2,1},{2,2},{},-1)
 
 --special nouns
@@ -136,24 +133,34 @@ addlogic("group",0,{3,2},{3,3},{},-1)
 addlogic("group2",0,{2,1},{2,2},{},-1)
 addlogic("group3",0,{5,2},{5,3},{},-1)
 addlogic("empty",0,{0,1},{0,3},{},-1)
+addlogic("cursor",0,{2,3},{2,4},{},-1)
 
 --normal nouns
 addlogic("baba",0,{4,0},{4,1},{},-1)
 addlogic("flag",0,{6,1},{2,4},{},-1)
 addlogic("wall",0,{1,1},{0,1},{},-1)
 addlogic("rock",0,{6,0},{6,1},{},-1)
+addlogic("brick",0,{6,0},{6,1},{},-1)
 addlogic("tile",0,{1,1},{0,1},{},-1)
 addlogic("grass",0,{5,1},{5,3},{},-1)
 addlogic("hedge",0,{5,0},{5,1},{},-1)
 addlogic("water",0,{1,2},{1,3},{},-1)
 addlogic("lava",0,{2,2},{2,3},{},-1)
+addlogic("bog",0,{5,1},{5,3},{},-1)
+addlogic("belt",0,{1,2},{1,3},{},-1)
+addlogic("cog",0,{0,1},{0,2},{},-1)
 addlogic("fire",0,{2,0},{2,2},{},-1)
 addlogic("ice",0,{1,2},{1,3},{},-1)
 addlogic("skull",0,{2,0},{2,1},{},-1)
+addlogic("pipe",0,{1,1},{0,1},{},-1)
 addlogic("keke",0,{2,1},{2,2},{},-1)
+addlogic("me",0,{3,0},{3,1},{},-1)
+addlogic("fofo",0,{5,1},{5,2},{},-1)
+addlogic("it",0,{1,2},{1,4},{},-1)
 addlogic("box",0,{6,0},{6,1},{},-1)
 addlogic("door",0,{2,1},{2,2},{},-1)
 addlogic("key",0,{6,1},{2,4},{},-1)
+addlogic("square",0,{4,0},{4,1},{},-1)
 addlogic("circle",0,{5,2},{5,3},{},-1)
 addlogic("fruit",0,{2,1},{2,2},{},-1)
 addlogic("tree",0,{5,1},{5,2},{},-1)
@@ -164,21 +171,14 @@ addlogic("crab",0,{2,1},{2,2},{},-1)
 addlogic("bubble",0,{1,3},{1,4},{},-1)
 addlogic("algae",0,{5,1},{5,2},{},-1)
 addlogic("jelly",0,{1,3},{1,4},{},-1)
-
---verbs
-addlogic("is",1,{0,1},{0,3},{0,2},-1)
-addlogic("has",1,{0,1},{0,3},{0},-1)
-addlogic("eat",1,{2,1},{2,2},{0},-1)
-addlogic("fear",1,{2,1},{2,2},{0},-1)
-addlogic("follow",1,{5,1},{5,3},{0},-1)
-addlogic("make",1,{0,1},{0,3},{0},-1)
-addlogic("mimic",1,{2,1},{2,2},{0},-1)
-addlogic("write",1,{0,1},{0,3},{0,2},-1)
-addlogic("log",1,{0,1},{0,3},{0,2},-1)
+addlogic("cliff",0,{6,1},{6,2},{},-1)
+addlogic("star",0,{6,1},{2,4},{},-1)
+addlogic("moon",0,{6,1},{2,4},{},-1)
+addlogic("dust",0,{6,1},{2,4},{},-1)
 
 --props
---addlogic("flow",2,{4,0},{4,2},{},-1)
 addlogic("you",2,{4,0},{4,1},{},-1)
+addlogic("you2",2,{4,0},{4,1},{},-1)
 addlogic("win",2,{6,1},{2,4},{},-1)
 addlogic("stop",2,{5,0},{5,1},{},-1)
 addlogic("push",2,{6,0},{6,1},{},-1)
@@ -194,6 +194,9 @@ addlogic("float",2,{1,2},{1,4},{},-1)
 addlogic("tele",2,{1,2},{1,4},{},-1)
 addlogic("pull",2,{6,1},{6,2},{},-1)
 addlogic("weak",2,{1,1},{1,2},{},-1)
+addlogic("boom",2,{2,1},{2,2},{},-1)
+addlogic("safe",2,{0,1},{0,3},{},-1)
+addlogic("phantom",2,{1,1},{0,1},{},-1)
 addlogic("swap",2,{3,0},{3,1},{},-1)
 addlogic("right",2,{1,2},{1,4},{},-1)
 addlogic("up",2,{1,2},{1,4},{},-1)
@@ -219,7 +222,6 @@ addlogic("deturn",2,{1,2},{1,4},{},-1)
 addlogic("power",2,{6,1},{2,4},{},-1)
 addlogic("power2",2,{5,2},{5,3},{},-1)
 addlogic("power3",2,{3,2},{4,4},{},-1)
-addlogic("refers",3,{0,1},{0,3},{0,2},-1)
 
 formatobjlist()
 

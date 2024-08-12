@@ -30,7 +30,6 @@ end
 table.insert(nlist.full, "node")
 table.insert(nlist.short, "node")
 table.insert(nlist.objects, "node")
-table.insert(nlist.brief, "node")
 
 editor_objlist["text_node"] =
 {
