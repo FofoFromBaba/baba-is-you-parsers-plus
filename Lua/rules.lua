@@ -180,7 +180,6 @@ function code(alreadyrun_)
 				end
 				docode(firstwords,wordunits)
 				dologic(flowunits)
-				dorb()
 				subrules()
 				grouprules()
 				playrulesound = postrules(alreadyrun)
